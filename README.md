@@ -170,6 +170,12 @@ The bar appears in the **next** `claude` session and updates after every respons
 
 ---
 
+## Created by
+
+[David Daganzo](https://github.com/daviddaganzo) · [Dinael Urdaneta](https://github.com/dinael)
+
+---
+
 # Claude Code — Barra de estado
 
 Añade una barra de estado de tres líneas en la terminal de Claude Code, actualizada tras cada respuesta:
@@ -343,3 +349,190 @@ La barra aparece en la **siguiente** sesión de `claude` y se actualiza tras cad
    '{"model":{"display_name":"Claude Sonnet 4.6"},"context_window":{"context_window_size":200000,"used_percentage":20,"total_input_tokens":40000},"cost":{"total_cost_usd":0.14,"total_duration_ms":480000},"transcript_path":""}' | node C:/Users/$env:USERNAME/.claude/statusline.js
    ```
    Debe imprimir tres líneas sin error.
+
+---
+
+## Creado por
+
+[David Daganzo](https://github.com/daviddaganzo) · [Dinael Urdaneta](https://github.com/dinael)
+
+---
+
+# Claude Code — Barre de statut
+
+Ajoute une barre de statut de trois lignes dans le terminal Claude Code, mise à jour après chaque réponse :
+
+- **Barre de contexte** avec pourcentage d'utilisation.
+- **Coût estimé du dernier tour** (tokens envoyés et reçus par message).
+- **Compteur de tokens** accumulés pour la session.
+- **Coût total** de la session en **$ (USD)** et **€ (EUR approx.)**.
+- Modèle actif, durée de session et jauges de limite du plan.
+
+```
+💻 SESSION /· 🤖 modèle:Sonnet 4.6· 📊 ctx:▓▓▓▓▓░░░░░ 47% 🧠 memo:94.1k/200.0k· 🧩 tokens:209.5k
+⚡ DERN.ITER /  ⬆️ entrée:202tok  ⬇️ sortie:130tok  🪙 coût:$0.003/€0.002· 💸 coût total:$2.63/€2.42
+🔋 PLAN /· ⏳ temps:62m· ❗ limite 5h:32% (10m)· 🚧 limite sem:15% (4d 4h)
+```
+
+Les **labels** s'affichent en gris atténué et les **valeurs** sont colorées selon leur type :
+
+| Couleur | Utilisée pour |
+|---------|---------------|
+| Cyan    | Tokens (session, entrée/sortie du tour) |
+| Magenta | Coût du tour |
+| Vert    | Coût total, temps de session |
+| Vert/Jaune/Rouge | Barre de contexte et valeurs memo (selon % d'utilisation) |
+
+**Ligne 1 — tokens :**
+
+- `💻 SESSION /` — en-tête de section.
+- `🤖 modèle:` + nom du modèle actif.
+- `📊 ctx:▓▓░░ 20%` — barre d'utilisation du contexte (vert < 60 %, jaune ≥ 60 %, rouge ≥ 85 %).
+- `🧠 memo:40k/200k` — compteur de tokens, coloré comme la barre.
+- `🧩 tokens:` — nouveaux tokens accumulés dans la session (relectures du cache exclues).
+
+**Ligne 2 — tour et coûts :**
+
+- `⚡ DERN.ITER /  ⬆️ entrée:Xtok  ⬇️ sortie:Xtok` — tokens du **dernier tour** (entrée et sortie).
+  Masqué au tout premier tour faute de données de tour précédent.
+- `🪙 coût:` — coût estimé du dernier tour en USD et EUR (magenta).
+- `💸 coût total:` — coût cumulé de la session en USD et EUR (vert).
+
+**Ligne 3 — plan :**
+
+- `🔋 PLAN /` — en-tête de section.
+- `⏳ temps:` — minutes de session écoulées (vert).
+- `❗ limite 5h:` / `🚧 limite sem:` — utilisation du plan Claude (limites 5 h et hebdomadaire) avec le
+  **temps restant** avant réinitialisation entre parenthèses. Visible uniquement sur les plans
+  d'abonnement Pro/Max.
+
+## Tarification par modèle
+
+Le coût du tour est calculé avec les tarifs officiels d'Anthropic en vigueur à la date de publication (2026-06-18).
+Consultez la [page de tarification d'Anthropic](https://www.anthropic.com/pricing) pour les tarifs actuels.
+
+| Modèle | Entrée ($/MTok) | Sortie ($/MTok) |
+|--------|-----------------|-----------------|
+| Opus   | $15             | $75             |
+| Sonnet | $3              | $15             |
+| Haiku  | $0.80           | $4              |
+
+Le modèle est détecté automatiquement depuis le nom renvoyé par Claude Code.
+
+## Prérequis
+
+**Node.js** doit être installé. Vérifiez avec :
+
+```bash
+node -v
+```
+
+## Installation
+
+### Étape 1 — Copier le script
+
+Copiez `statusline.js` dans votre dossier de configuration Claude Code :
+
+- **Windows :** `C:\Users\VOTRE_NOM\.claude\statusline.js`
+- **Mac / Linux :** `~/.claude/statusline.js`
+
+### Étape 2 — L'activer dans `settings.json`
+
+Ouvrez `~/.claude/settings.json` (Windows : `C:\Users\VOTRE_NOM\.claude\settings.json`) et
+ajoutez le bloc `statusLine` **à l'intérieur de l'objet racine**, en respectant les virgules JSON existantes :
+
+```json
+{
+  "statusLine": {
+    "type": "command",
+    "command": "node ~/.claude/statusline.js",
+    "padding": 0
+  }
+}
+```
+
+Sur Windows, utilisez le chemin absolu :
+
+```json
+{
+  "statusLine": {
+    "type": "command",
+    "command": "node C:/Users/VOTRE_NOM/.claude/statusline.js",
+    "padding": 0
+  }
+}
+```
+
+Si `settings.json` n'existe pas encore, créez-le avec exactement ce contenu.
+
+### Étape 3 — Redémarrer Claude Code
+
+La barre apparaît à la **prochaine** session `claude` et se met à jour après chaque réponse.
+
+## Personnalisation
+
+- **Taux de change €/$ :** modifiez la constante `EUR_RATE` en haut de `statusline.js`
+  (valeur par défaut : `0.92`).
+
+- **Langue :** configurable via la variable d'environnement `STATUSLINE_LANG`. Valeurs disponibles :
+
+  | Valeur | Langue   | Exemples d'en-têtes |
+  |--------|----------|---------------------|
+  | `es`   | Español  | `💻 SESIÓN /` `⚡ ÚLT.ITER /` `🔋 PLAN /` |
+  | `en`   | English  | `💻 SESSION /` `⚡ LAST.ITER /` `🔋 PLAN /` |
+  | `fr`   | Français | `💻 SESSION /` `⚡ DERN.ITER /` `🔋 PLAN /` |
+
+  Utilise `es` par défaut si la variable n'est pas définie ; bascule sur `en` pour toute valeur non reconnue.
+
+  **Changer la langue pour la session en cours :**
+
+  ```powershell
+  # Windows (PowerShell)
+  $env:STATUSLINE_LANG = "fr"
+  claude
+  ```
+  ```bash
+  # Mac / Linux
+  STATUSLINE_LANG=fr claude
+  ```
+
+  **Rendre le changement permanent :**
+
+  ```powershell
+  # Windows (PowerShell) — ajouter au profil
+  Add-Content $PROFILE '$env:STATUSLINE_LANG = "fr"'
+  ```
+  ```bash
+  # Mac / Linux — ajouter à ~/.bashrc ou ~/.zshrc
+  export STATUSLINE_LANG=fr
+  ```
+
+## Notes
+
+- Le coût du tour est une **estimation** calculée à partir des tokens du transcript et des tarifs
+  Anthropic. Sur les plans d'abonnement, il ne reflète pas la facturation réelle.
+- « tokens » additionne entrée + sortie + cache de chaque tour (tokens traités), ce qui est
+  généralement bien supérieur à l'utilisation actuelle de la fenêtre de contexte.
+- Le segment `⚡ DERN.ITER /` n'apparaît pas au premier démarrage car il n'y a pas de tour précédent à mesurer.
+- Le séparateur entre les éléments est `· ` (point puis espace, sans espace initial) afin que si
+  une ligne se coupe dans un terminal étroit, la continuation visuelle commence sans espace.
+
+## Si la barre n'apparaît pas
+
+1. Vérifiez que `settings.json` est du JSON valide (virgules correctes, pas de virgule finale).
+2. Testez le script manuellement :
+   ```bash
+   # Mac / Linux
+   echo '{"model":{"display_name":"Claude Sonnet 4.6"},"context_window":{"context_window_size":200000,"used_percentage":20,"total_input_tokens":40000},"cost":{"total_cost_usd":0.14,"total_duration_ms":480000},"transcript_path":""}' | node ~/.claude/statusline.js
+   ```
+   ```powershell
+   # Windows (PowerShell)
+   '{"model":{"display_name":"Claude Sonnet 4.6"},"context_window":{"context_window_size":200000,"used_percentage":20,"total_input_tokens":40000},"cost":{"total_cost_usd":0.14,"total_duration_ms":480000},"transcript_path":""}' | node C:/Users/$env:USERNAME/.claude/statusline.js
+   ```
+   Le script doit afficher trois lignes sans erreur.
+
+---
+
+## Créé par
+
+[David Daganzo](https://github.com/daviddaganzo) · [Dinael Urdaneta](https://github.com/dinael)
