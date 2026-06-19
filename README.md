@@ -188,7 +188,7 @@ Añade una barra de estado de tres líneas en la terminal de Claude Code, actual
 
 ```
 💻 SESIÓN /· 🤖 Modelo:Sonnet 4.6· 📊 ctx:▓▓▓▓▓░░░░░ 47% 🧠 memo:94.1k/200.0k· 🧩 tokens:209.5k
-⚡ ÚLT.ITER /  ⬆️ entrada:202tok  ⬇️ salida:130tok  🪙 costo:$0.003/€0.002· 💸 costo total:$2.63/€2.42
+⚡ ÚLT.ITER /  ⬆️ entrada:202tok  ⬇️ salida:130tok  🪙 coste:$0.003/€0.002· 💸 coste total:$2.63/€2.42
 🔋 PLAN /· ⏳ tiempo:62m· ❗ límite 5h:32% (10m)· 🚧 límite sem:15% (4d 4h)
 ```
 
@@ -197,8 +197,8 @@ Los **labels** se muestran en gris tenue y los **valores** en color según su ti
 | Color   | Usado en |
 |---------|----------|
 | Cyan    | Tokens (sesión, entrada/salida del turno) |
-| Magenta | Costo del turno |
-| Verde   | Costo total, tiempo de sesión |
+| Magenta | coste del turno |
+| Verde   | coste total, tiempo de sesión |
 | Verde/Amarillo/Rojo | Barra de contexto y valores memo (según % de uso) |
 
 **Línea 1 — tokens:**
@@ -209,12 +209,12 @@ Los **labels** se muestran en gris tenue y los **valores** en color según su ti
 - `🧠 memo:40k/200k` — tokens en memoria, con el mismo color que la barra.
 - `🧩 tokens:` — tokens nuevos acumulados en la sesión (sin contar relecturas de caché).
 
-**Línea 2 — turno y costos:**
+**Línea 2 — turno y costes:**
 
 - `⚡ ÚLT.ITER /  ⬆️ entrada:Xtok  ⬇️ salida:Xtok` — tokens del **último turno** (entrada y salida).
   Solo aparece cuando hay datos del turno.
-- `🪙 costo:` — coste estimado del último turno en USD y EUR (magenta).
-- `💸 costo total:` — coste acumulado de la sesión en USD y EUR (verde).
+- `🪙 coste:` — coste estimado del último turno en USD y EUR (magenta).
+- `💸 coste total:` — coste acumulado de la sesión en USD y EUR (verde).
 
 **Línea 3 — plan:**
 
